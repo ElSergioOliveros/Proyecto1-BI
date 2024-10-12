@@ -96,7 +96,7 @@
 
 <div class="container">
     <h1>Interfaz de Predicción de Texto</h1>
-    <textarea id="input-text" placeholder="Escribe o pega tu texto aquí..."></textarea>
+    <textarea id="input-text" placeholder="Escribe o pega tu texto aquí. Separa los textos con enter (\n)."></textarea>
     <button id="predict-btn">Enviar para Predicción</button>
     
     <table id="prediction-table">
@@ -139,21 +139,26 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ doc_0: inputText })
+            body: JSON.stringify({msg: inputText})
         })
         .then(response => response.json())
         .then(data => {
-            const probNeg = data[0][0];
-            const probPos = data[0][1];
             const tableBody = document.querySelector("#prediction-table tbody");
-            const newRow = `
+            
+            for (let i = 0; i < data.length; i++) {
+                const newRow = `
                 <tr>
-                    <td>${inputText}</td>
-                    <td>${probPos > probNeg ? 'Positivo' : 'Negativo'}</td>
-                    <td>${probPos.toFixed(2)}</td>
+                    <td>${data[i][0]}</td>
+                    <td>${data[i][1]}</td>
+                    <td>${data[i][2]}</td>
                 </tr>
             `;
             tableBody.innerHTML += newRow;
+                }
+
+            
+            
+            
         })
         .catch(error => {
             console.error('Error:', error);

@@ -1,11 +1,15 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import PipelineController
 import pandas as pd
+import numpy as np
 import joblib
 import json
 import os
 
 app = Flask(__name__)
+
+CORS(app)
 
 if os.path.exists(os.path.join(".", "Entrega2", "Model", "model.pkl")):
     pipeline = joblib.load(os.path.join(".", "Entrega2", "Model", "model.pkl"))
@@ -15,18 +19,20 @@ else:
 
 @app.route("/predict", methods=['POST'])
 def predict():
-    dataString = request.get_json()
-    dataJson = json.loads(dataString)
-    
-    documents = []
-    for key in dataJson.keys():
-        documents.append(dataJson[key])
+    dataDict = request.get_json()
+    documents  = dataDict["msg"].split("\n")
 
     documents = pd.Series(documents)
 
-    preds = pipeline.predict_proba(documents)
+    documentsNumpy = documents.values
 
-    return jsonify(preds.tolist())
+    preds = pipeline.predict_proba(documents)
+    predIndices = np.argmax(preds, axis=1) + 3
+    probas = np.max(preds, axis=1)
+
+    matrix = np.column_stack((documentsNumpy, predIndices, probas))
+
+    return jsonify(matrix.tolist())
 
 
 @app.route("/retrain", methods=['POST'])
