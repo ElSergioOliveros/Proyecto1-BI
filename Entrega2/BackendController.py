@@ -29,7 +29,23 @@ def predict():
     return jsonify(preds.tolist())
 
 
+@app.route("/retrain", methods=['POST'])
+def retrain():
+    dataString = request.get_json()
+    dataJson = json.loads(dataString)
 
+    targetVariable = dataJson["targetVariable"]
+
+    df = dataJson["data"]
+    df = json.loads(df)
+    df = pd.DataFrame(df)
+
+    documentsKey = [key for key in df.keys() if key != targetVariable][0]
+
+    pipeline, classReport = PipelineController.retrainPipeline(df[documentsKey], df[targetVariable])
+    joblib.dump(pipeline, os.path.join(".", "Entrega2", "Model", "model.pkl"))
+
+    return {"message": classReport}
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

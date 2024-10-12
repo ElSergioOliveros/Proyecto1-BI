@@ -36,6 +36,19 @@ def getTrainedPipeline():
 
     return pipeline
 
+def retrainPipeline(documents, labels):
+    pipeline = getPipeline()
+    xTrain, xVal, yTrain, yVal = train_test_split(documents, labels, test_size=0.2, random_state=42, stratify=labels)
+
+    pipeline.fit(xTrain, yTrain)
+
+    preds = pipeline.predict(xVal)
+
+    classReport = classification_report(yVal, preds)
+
+    return pipeline, classReport
+    
+
 if __name__ == "__main__":
     odsData = readOriginalData()
 
