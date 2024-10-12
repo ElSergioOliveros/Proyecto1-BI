@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Predicción de Texto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Interfaz de Predicción de Texto</h1>
+    <textarea id="input-text" placeholder="Escribe o pega tu texto aquí..."></textarea>
+    <button id="predict-btn">Enviar para Predicción</button>
+    <div id="result" class="result">Las predicciones aparecerán aquí.</div>
+</div>
+
+<script>
+    document.getElementById('predict-btn').addEventListener('click', function() {
+        const inputText = document.getElementById('input-text').value;
+
+        if (!inputText.trim()) {
+            document.getElementById('result').innerHTML = '<span class="error">Por favor, ingrese algún texto para predecir.</span>';
+            return;
+        }
+
+        fetch('http://127.0.0.1:5000/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ doc_0: inputText })
+        })
+        .then(response => response.json())
+        .then(data => {
+            let probNeg = data[0][0];
+            let probPos = data[0][1];
+            document.getElementById('result').innerHTML = `
+                <strong>Predicción:</strong><br>
+                Probabilidad Negativa: ${probNeg.toFixed(2)}<br>
+                Probabilidad Positiva: ${probPos.toFixed(2)}
+            `;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('result').innerHTML = '<span class="error">Error en la predicción. Inténtalo de nuevo.</span>';
+        });
+    });
+</script>
+
+</body>
+</html>
