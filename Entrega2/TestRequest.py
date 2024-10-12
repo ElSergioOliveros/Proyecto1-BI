@@ -8,7 +8,7 @@ import pandas as pd
 data = pd.read_csv("documentsVal.csv")
 
 data = data[data.columns[0]].to_json()
-url = " http://127.0.0.1:5000/predict"
+url = "http://127.0.0.1:5000/predict"
 
 response = requests.post(url, json=data)
 
