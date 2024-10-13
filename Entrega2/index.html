@@ -179,7 +179,6 @@
         const file = fileInput.files[0];
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('retrain_type', retrainType);
 
         fetch('http://127.0.0.1:5000/retrain', {
             method: 'POST',

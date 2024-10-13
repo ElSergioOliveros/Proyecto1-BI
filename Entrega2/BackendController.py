@@ -39,6 +39,7 @@ def predict():
 def retrain():
     dataString = request.get_json()
     dataJson = json.loads(dataString)
+    
 
     targetVariable = dataJson["targetVariable"]
 
